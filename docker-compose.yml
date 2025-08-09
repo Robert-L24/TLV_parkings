@@ -1,0 +1,20 @@
+services:
+  poller:
+    build: .
+    restart: always
+    volumes:
+      - ./db:/app/db
+    environment:
+      - TZ=Europe/Jerusalem
+    command: python main.py
+
+  visualizer:
+    build: .
+    restart: always
+    volumes:
+      - ./db:/app/db
+    environment:
+      - TZ=Europe/Jerusalem
+    command: streamlit run visualize.py
+    ports:
+      - "8501:8501"

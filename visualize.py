@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
 from utils import plot_avg_weekly
+import os.path
 
-df = pd.read_csv("parkings_statuses.csv", parse_dates=["datetime"])
+df = pd.read_csv(os.path.join("db", "parkings_statuses.csv"), parse_dates=["datetime"])
 df.dropna(inplace=True)
 status_map = {'available': 1, 'full': 0}
 df['Probability to be available'] = df['parking_status'].map(status_map)
