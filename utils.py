@@ -84,6 +84,59 @@ def plot_avg_weekly(
             layer="below",
             line_width=0
         )
+    # Free parking definition
+    free_parking = {
+        "Sunday": ("19:00", "8:00"),
+        "Monday": ("19:00", "8:00"),
+        "Tuesday": ("19:00", "8:00"),
+        "Wednesday": ("19:00", "8:00"),
+        "Thursday": ("19:00", "8:00"),
+        "Friday": ("15:00", "8:00"),
+        "Saturday": ("8:00", "8:00")
+    }
+
+    def time_to_index(t_str):
+        """Convert HH:MM string to slot index within a day."""
+        hh, mm = map(int, t_str.split(":"))
+        return (hh * 60 + mm) // time_interval
+
+    # Add green rectangles for free parking
+    for day_name, (start_str, end_str) in free_parking.items():
+        day_idx = day_names.index(day_name)
+        start_idx = time_to_index(start_str)
+        end_idx = time_to_index(end_str)
+
+        if start_idx < end_idx:
+            # Same day
+            fig.add_vrect(
+                x0=day_idx * day_length + start_idx - 0.5,
+                x1=day_idx * day_length + end_idx - 0.5,
+                fillcolor="green",
+                opacity=0.1,
+                layer="below",
+                line_width=0
+            )
+        else:
+            # Spans midnight into next day
+            # From start to end of day
+            fig.add_vrect(
+                x0=day_idx * day_length + start_idx - 0.5,
+                x1=(day_idx + 1) * day_length - 0.5,
+                fillcolor="green",
+                opacity=0.1,
+                layer="below",
+                line_width=0
+            )
+            # From start of next day to end time
+            next_day_idx = (day_idx + 1) % len(day_names)
+            fig.add_vrect(
+                x0=next_day_idx * day_length - 0.5,
+                x1=next_day_idx * day_length + end_idx - 0.5,
+                fillcolor="green",
+                opacity=0.1,
+                layer="below",
+                line_width=0
+            )
 
     # Average line
     fig.add_trace(go.Scatter(

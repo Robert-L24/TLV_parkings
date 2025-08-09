@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
 import csv
+import os.path
+from zoneinfo import ZoneInfo
+
 
 def fetch_parking_page(id):
     url = f"https://www.ahuzot.co.il/Parking/ParkingDetails/?ID={id}"
@@ -55,9 +58,10 @@ def write_parking_status(id, res):
     except Exception as e:
         print(e)
     finally:
-        with open('parkings_statuses.csv', 'a', newline='', encoding='utf-8') as f:
+        with open(os.path.join('db', 'parkings_statuses.csv'), 'a', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=res.keys())
-            writer.writerow({'datetime': datetime.now(), 'parking_id': id, 'parking_name': name, 'parking_address': addr, 'parking_status': status})
+            now = datetime.now(ZoneInfo("Asia/Jerusalem"))
+            writer.writerow({'datetime': now.strftime("%Y-%m-%d %H:%M:%S.%f"), 'parking_id': id, 'parking_name': name, 'parking_address': addr, 'parking_status': status})
 
 def main():
     res = {'datetime': None, 'parking_id': None, 'parking_name': None, 'parking_address': None, 'parking_status': None}
